@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
-from accounts.models import CustomUser
 from django.test import RequestFactory, TestCase
+
+from accounts.models import CustomUser
 
 from .views import *
 from .models import *

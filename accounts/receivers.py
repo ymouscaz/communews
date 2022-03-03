@@ -1,14 +1,11 @@
-#from django.core.signals import request_finished
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-
 from django.conf import settings
 
-
-
-from .models import CustomUser, Invitation, EmailVerification, PasswordResetRequest
+from .models import (CustomUser, Invitation, EmailVerification,
+                     PasswordResetRequest)
 
 
 @receiver(pre_save)
@@ -30,13 +27,12 @@ Would you like to accept {inviting_user}'s invite?
 
 Please sign up here: https://news.python.sc{url}
 
--- 
+--
 news.python.sc - A social news aggregator for the Python community.
 
-""".format(inviting_user=instance.inviting_user.username, url=instance.get_register_url())
-        #html_content = '<p>This is an <strong>important</strong> message.</p>'
+""".format(inviting_user=instance.inviting_user.username,
+           url=instance.get_register_url())
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        #msg.attach_alternative(html_content, "text/html")
         msg.send()
 
 
@@ -51,7 +47,7 @@ def create_verification(sender, instance, created, **kwargs):
                 verified = any([i.verified for i in verifications])
                 # create_v = not verified
                 create_v = False
-            
+
             if create_v:
                 verification = EmailVerification(user=instance, email=instance.email)
                 verification.save()
@@ -66,13 +62,11 @@ Please confirm your email address here:
 
 https://news.python.sc{url}
 
--- 
+--
 news.python.sc - A social news aggregator for the Python community.
 
 """.format(url=instance.get_verify_url())
-        #html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        #msg.attach_alternative(html_content, "text/html")
         msg.send()
 
 
@@ -85,11 +79,9 @@ Please confirm your email address here:
 
 https://news.python.sc{url}
 
--- 
+--
 news.python.sc - A social news aggregator for the Python community.
 
 """.format(url=instance.get_verify_url())
-        #html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        #msg.attach_alternative(html_content, "text/html")
         msg.send()
