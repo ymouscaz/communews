@@ -6,6 +6,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
 
+from ratelimit.exceptions import Ratelimited
+
 urlpatterns = [
     path('', include('news.urls')),
     path('', include('accounts.urls')),
@@ -20,7 +22,6 @@ if settings.DEBUG:
     ] + urlpatterns
 
 
-from ratelimit.exceptions import Ratelimited
 def handler403(request, exception=None):
     if isinstance(exception, Ratelimited):
         return HttpResponse("<img src='https://http.cat/429.jpg'><br>Sorry, we're not able to serve your requests this quickly.", status=429)
