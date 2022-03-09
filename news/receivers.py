@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 from .models import Item, Vote, Comment, Story
 
+
 @receiver(pre_save)
 def mark_show_and_ask(sender, instance, **kwargs):
     if isinstance(instance, Story):
@@ -27,7 +28,9 @@ def check_for_duplicates(sender, instance, created, **kwargs):
     if created and isinstance(instance, Story):
         story = instance
         if story.url and story.duplicate_of is None:
-            other_stories = Story.objects.filter(url=story.url).exclude(pk=story.pk).order_by('-changed_at')
+            other_stories = Story.objects.filter(url=story.url)\
+                                         .exclude(pk=story.pk)\
+                                         .order_by('-changed_at')
             c = other_stories.count()
             if c > 0:
                 new_vote = Vote(item=other_stories[0], vote=1, user=story.user)
@@ -41,7 +44,9 @@ def update_votes_count_on_submission(sender, instance, created, **kwargs):
     if created and isinstance(instance, Vote):
         vote = instance
         item = instance.item
-        other_votes = Vote.objects.filter(item=vote.item, user=vote.user, vote=vote.vote).exclude(pk=vote.pk)
+        other_votes = Vote.objects.filter(item=vote.item,
+                                          user=vote.user,
+                                          vote=vote.vote).exclude(pk=vote.pk)
         if other_votes.count():
             return
         if instance.vote > 0:
@@ -56,7 +61,9 @@ def update_votes_count_on_submission(sender, instance, created, **kwargs):
 def update_user_karma_on_vote(sender, instance, created, **kwargs):
     if created and isinstance(instance, Vote):
         vote = instance
-        other_votes = Vote.objects.filter(item=vote.item, user=vote.user, vote=vote.vote).exclude(pk=vote.pk)
+        other_votes = Vote.objects.filter(item=vote.item,
+                                          user=vote.user,
+                                          vote=vote.vote).exclude(pk=vote.pk)
         if other_votes.count():
             return
         item = instance.item
