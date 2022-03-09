@@ -1,6 +1,7 @@
 from django.conf import settings
 from .models import Subscription, EmailDigest
 
+# TODO : analyze this function and call(s) of it
 def create_and_send_digest(frequency):
     pass
     # Get list of objects
@@ -11,6 +12,7 @@ def create_and_send_digest(frequency):
         tpl = 'TODO: Here is your list' # TODO
         subject = settings.SITE_NAME + " " + frequency + " Digest"
         send_mail(subscription, tpl, subject)
+
 
 def send_mail(subscription, template, subject):
     pass

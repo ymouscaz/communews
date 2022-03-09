@@ -6,6 +6,7 @@ from .views import *
 from .models import *
 from .forms import *
 
+
 class BasicEmailDigestTest(TestCase):
     """Tests the basic functionality of the emaildigest app."""
     def setUp(self):
@@ -19,11 +20,12 @@ class BasicEmailDigestTest(TestCase):
     def _subscribe(self, i=0):
         self.assertEqual(Subscription.objects.all().count(), 0+i)
 
-        request = self.factory.post('/digest/subscribe', {'email': 'test@example.org'})
+        request = self.factory.post('/digest/subscribe',
+                                    {'email': 'test@example.org'})
         request.user = self.user
         response = subscribe(request)
 
-        #self.assertContains(response.url, 'thankyou')
+        # self.assertContains(response.url, 'thankyou')
         self.assertRegex(response.url, r'.*thankyou.*')
 
         self.assertEqual(Subscription.objects.all().count(), 1+i)
@@ -31,7 +33,7 @@ class BasicEmailDigestTest(TestCase):
         subscription = Subscription.objects.all().order_by('-created_at')[0]
         self.assertFalse(subscription.is_active)
 
-        verification_code = subscription.anonymoussubscription.verification_code
+        verification_code = subscription.anonymoussubscription.verification_code  # NOQA
 
         return subscription
 
@@ -39,7 +41,7 @@ class BasicEmailDigestTest(TestCase):
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertFalse(subscription.anonymoussubscription.verified)
         self.assertFalse(subscription.is_active)
-        verification_code = subscription.anonymoussubscription.verification_code
+        verification_code = subscription.anonymoussubscription.verification_code  # NOQA
 
         url = '/digest/subscribe?v=' + str(verification_code)
 
@@ -48,9 +50,9 @@ class BasicEmailDigestTest(TestCase):
         response = subscribe(request)
 
         subscription = Subscription.objects.get(pk=subscription.pk)
-        anonymoussubscription = AnonymousSubscription.objects.get(pk=subscription.pk)
+        anonymoussubscription = AnonymousSubscription.objects.get(
+                                                            pk=subscription.pk)
         self.assertTrue(anonymoussubscription.verified)
-
 
     def _unsubscribe_via_mail(self, subscription, assert_form_error=False):
         subscription = Subscription.objects.get(pk=subscription.pk)
@@ -58,7 +60,9 @@ class BasicEmailDigestTest(TestCase):
         self.assertEqual(UnSubscription.objects.all().count(), 0)
 
         url = '/digest/unsubscribe'
-        request = self.factory.post(url, {'email': subscription.anonymoussubscription.email})
+        request = self.factory.post(
+                        url,
+                        {'email': subscription.anonymoussubscription.email})
         request.user = self.user
         response = unsubscribe(request)
         if assert_form_error:
@@ -73,11 +77,9 @@ class BasicEmailDigestTest(TestCase):
         unsubscription = UnSubscription.objects.get()
         return unsubscription
 
-
     def test_subscribe(self):
         subscription = self._subscribe()
         self.assertFalse(subscription.is_active)
-
 
     def test_subscribe_confirm(self):
         subscription = self._subscribe()
@@ -85,13 +87,11 @@ class BasicEmailDigestTest(TestCase):
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertTrue(subscription.is_active)
 
-
     def test_subscribe_unsubscribe(self):
         subscription = self._subscribe()
         unsubscription = self._unsubscribe_via_mail(subscription, assert_form_error=True)
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertFalse(subscription.is_active)
-
 
     def test_subscribe_confirm_unsubscribe(self):
         subscription = self._subscribe()
@@ -99,7 +99,6 @@ class BasicEmailDigestTest(TestCase):
         unsubscription = self._unsubscribe_via_mail(subscription)
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertFalse(subscription.is_active)
-
 
     def test_subscribe_unsubscribe_confirm(self):
         subscription = self._subscribe()
@@ -114,7 +113,6 @@ class BasicEmailDigestTest(TestCase):
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertTrue(subscription.is_active)
 
-
     def test_subscribe_confirm_unsubscribe_subscribe(self):
         subscription = self._subscribe()
         self._confirm(subscription)
@@ -124,12 +122,10 @@ class BasicEmailDigestTest(TestCase):
         subscription2 = Subscription.objects.get(pk=subscription2.pk)
         self.assertFalse(subscription.is_active)
 
-
-
     def test_subscribe_confirm_unsubscribe_subscribe_confirm(self):
         subscription = self._subscribe()
         self._confirm(subscription)
-        
+
         unsubscription = self._unsubscribe_via_mail(subscription)
 
         subscription = Subscription.objects.get(pk=subscription.pk)
@@ -142,7 +138,6 @@ class BasicEmailDigestTest(TestCase):
         subscription = Subscription.objects.get(pk=subscription.pk)
         self.assertTrue(re_subscription.is_active)
         self.assertFalse(subscription.is_active)
-
 
 
 # class ReceiversEmailDigestTest(TestCase):

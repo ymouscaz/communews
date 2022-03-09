@@ -5,6 +5,7 @@ from .models import UserSubscription, AnonymousSubscription, Subscription
 
 class UserSubscriptionForm(forms.ModelForm):
     thankyou = 'u'
+
     class Meta:
         model = UserSubscription
         fields = []
@@ -12,10 +13,11 @@ class UserSubscriptionForm(forms.ModelForm):
 
 class AnonymousSubscriptionForm(forms.ModelForm):
     thankyou = 'a'
+
     class Meta:
         model = AnonymousSubscription
         fields = ['email']
-    
+
     def clean_email(self):
         data = self.cleaned_data['email']
         if data:
@@ -31,6 +33,7 @@ def validate_active_email(email):
             code='invalid',
             params={'email': email},)
 
+
 class UnsunscribeForm(forms.Form):
     email = forms.EmailField(validators=[validate_active_email])
 
@@ -42,6 +45,7 @@ class UnsunscribeForm(forms.Form):
 
 
 def get_subscription_form(user, *args, **kwargs):
+    # TODO : check here after removing the line below
     return AnonymousSubscriptionForm(*args, **kwargs)
     if user.is_authenticated:
         return UserSubscriptionForm(*args, **kwargs)
